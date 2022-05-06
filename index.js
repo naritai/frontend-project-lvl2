@@ -1,5 +1,5 @@
-const diff = require('./src/gendiff');
+const genDiff = require('./src/gendiff');
 
 module.exports = { 
-  default: diff
+  default: genDiff
  };
