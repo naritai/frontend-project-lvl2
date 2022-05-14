@@ -1,0 +1,9 @@
+name: predeploy-checks
+on: [push]
+jobs:
+  test-lint:
+    runs-on: ubuntu-latest
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+      - run: make test
+      - run: make lint

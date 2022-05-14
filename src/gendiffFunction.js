@@ -1,14 +1,10 @@
-#!/usr/bin/env node
-const { program } = require('commander');
-const fs = require('fs');
-const path = require('path');
-const process = require('process');
-const uniq = require('lodash/uniq');
-const sortBy = require('lodash/sortBy');
+/* eslint-disable no-prototype-builtins */
+/* eslint-disable no-param-reassign */
 
-
-program
-  .description('Compares two configuration files and shows a difference.');
+import fs from 'fs';
+import path from 'path';
+import process from 'process';
+import { uniq, sortBy } from 'lodash-es';
 
 function genDiff(filepath1, filepath2) {
   const resolvedPath1 = path.resolve(process.cwd(), filepath1);
@@ -17,7 +13,7 @@ function genDiff(filepath1, filepath2) {
   const parsedObj2 = JSON.parse(fs.readFileSync(resolvedPath2, { encoding: 'utf-8' }));
   const allUniqKeys = uniq([...Object.keys(parsedObj1), ...Object.keys(parsedObj2)]);
   const allSortedKeys = sortBy(allUniqKeys);
-  
+
   const rows = [];
 
   allSortedKeys.forEach((key) => {
@@ -41,31 +37,20 @@ function genDiff(filepath1, filepath2) {
 
   const result = rows.reduce((acc, item, idx, arr) => {
     if (idx === 0) {
-      acc += `{ \n ${item}`;
+      acc += `{\n  ${item}`;
       return acc;
     }
 
     if (idx === arr.length - 1) {
-      acc += `\n ${item}\n}`;
+      acc += `\n  ${item}\n}`;
       return acc;
     }
-    
-    acc += `\n ${item}`;
+
+    acc += `\n  ${item}`;
     return acc;
   }, '');
 
   return result;
 }
 
-program
-  .option('-V, --version', 'output the version number')
-  .option('-f, --format <type>', 'output format')
-  .argument('<filepath1>')
-  .argument('<filepath2>')
-  .action(genDiff);
-
-program.parse();
-
-
-
-module.exports = { genDiff };
+export default genDiff;
