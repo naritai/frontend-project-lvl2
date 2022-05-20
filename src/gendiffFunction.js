@@ -1,16 +1,10 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable no-param-reassign */
-
-import fs from 'fs';
-import path from 'path';
-import process from 'process';
 import { uniq, sortBy } from 'lodash-es';
+import parseFiles from './parsers.js';
 
 function genDiff(filepath1, filepath2) {
-  const resolvedPath1 = path.resolve(process.cwd(), filepath1);
-  const resolvedPath2 = path.resolve(process.cwd(), filepath2);
-  const parsedObj1 = JSON.parse(fs.readFileSync(resolvedPath1, { encoding: 'utf-8' }));
-  const parsedObj2 = JSON.parse(fs.readFileSync(resolvedPath2, { encoding: 'utf-8' }));
+  const [parsedObj1, parsedObj2] = parseFiles(filepath1, filepath2);
   const allUniqKeys = uniq([...Object.keys(parsedObj1), ...Object.keys(parsedObj2)]);
   const allSortedKeys = sortBy(allUniqKeys);
 

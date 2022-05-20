@@ -8,3 +8,6 @@ lint:
 
 test:
 	npx -n --experimental-vm-modules jest
+
+test-watch:
+	npx -n --experimental-vm-modules jest --watchAll
