@@ -29,7 +29,6 @@ function parseFiles(path1, path2) {
     if (ext === '.yml' || ext === '.yaml') {
       return parseYAML(filePath);
     }
-
     return path;
   });
 

@@ -8,7 +8,7 @@ program
 
 program
   .option('-V, --version', 'output the version number')
-  .option('-f, --format <type>', 'output format')
+  .option('-f, --format <type>', 'output format', 'stylish')
   .argument('<filepath1>')
   .argument('<filepath2>')
   .action(genDiff);
