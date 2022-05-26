@@ -1,19 +1,5 @@
 /* eslint-disable max-len */
-const ORIGINS = {
-  first: 'first',
-  second: 'second',
-  bothsame: 'bothsame',
-  bothdiff: 'bothdiff',
-  none: 'none',
-};
-
-const ORIGINS_MARKS = {
-  first: '-',
-  second: '+',
-  bothsame: ' ',
-  bothdiff: ' ',
-  none: ' ',
-};
+import { ORIGINS, ORIGINS_STYLISH_MARKS } from './constants.js';
 
 function stylish(ast) {
   const space = ' ';
@@ -35,13 +21,13 @@ function stylish(ast) {
 
       if (val.origin === ORIGINS.bothdiff) {
         nextLine = val.values.map((raw, id, arrVals) => {
-          const mark = ORIGINS_MARKS[raw.origin];
+          const mark = ORIGINS_STYLISH_MARKS[raw.origin];
           const nl = id > 0 && id === arrVals.length - 1 ? '\n' : '';
           const childrs = typeof raw.value === 'object' && raw.value !== null && raw.value.children ? raw.value.children : null;
           return `${nl}${offset}${mark} ${raw.key}: ${childrs ? iter(childrs, depth + 2) : raw.value}`;
         }).join('');
       } else {
-        const mark = val.origin === ORIGINS.bothdiff ? ORIGINS_MARKS[key] : ORIGINS_MARKS[val.origin];
+        const mark = ORIGINS_STYLISH_MARKS[val.origin];
         nextLine = `${offset}${mark} ${key}: ${iter(val, depth + 2)}`;
       }
 
@@ -62,13 +48,4 @@ function stylish(ast) {
   return iter(ast, 1);
 }
 
-function getFormatter(formatterType = 'stylish') {
-  switch (formatterType) {
-    case 'stylish':
-      return stylish;
-    default:
-      return stylish;
-  }
-}
-
-export default getFormatter;
+export default stylish;
