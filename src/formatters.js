@@ -1,18 +1,66 @@
-function stylish() {
-  // const result = rows.reduce((acc, item, idx, arr) => {
-  //   if (idx === 0) {
-  //     acc += `{\n  ${item}`;
-  //     return acc;
-  //   }
+/* eslint-disable max-len */
+const ORIGINS = {
+  first: 'first',
+  second: 'second',
+  bothsame: 'bothsame',
+  bothdiff: 'bothdiff',
+  none: 'none',
+};
 
-  //   if (idx === arr.length - 1) {
-  //     acc += `\n  ${item}\n}`;
-  //     return acc;
-  //   }
+const ORIGINS_MARKS = {
+  first: '-',
+  second: '+',
+  bothsame: ' ',
+  bothdiff: ' ',
+  none: ' ',
+};
 
-  //   acc += `\n  ${item}`;
-  //   return acc;
-  // }, '');
+function stylish(ast) {
+  const space = ' ';
+  const spacesCount = 4;
+
+  const iter = (nextNode, depth) => {
+    // return primitive value if it's exists. Also return array as is.
+    if ('value' in nextNode && !nextNode.children) {
+      return `${nextNode.value}`;
+    }
+
+    const children = nextNode.children ? nextNode.children : nextNode;
+    const iterable = Object.entries(children);
+
+    return iterable.reduce((acc, [key, val], idx, arr) => {
+      const offset = space.repeat(spacesCount * depth);
+      const offsetLast = space.repeat(spacesCount * depth - (spacesCount / 2));
+      let nextLine;
+
+      if (val.origin === ORIGINS.bothdiff) {
+        nextLine = val.values.map((raw, id, arrVals) => {
+          const mark = ORIGINS_MARKS[raw.origin];
+          const nl = id > 0 && id === arrVals.length - 1 ? '\n' : '';
+          console.log('raw.value', raw.value);
+          const childrs = typeof raw.value === 'object' && raw.value !== null && raw.value.children ? raw.value.children : null;
+          return `${nl}${offset}${mark} ${raw.key}: ${childrs ? iter(childrs, depth + 1) : raw.value}`;
+        }).join(' ');
+      } else {
+        const mark = val.origin === ORIGINS.bothdiff ? ORIGINS_MARKS[key] : ORIGINS_MARKS[val.origin];
+        nextLine = `${offset}${mark} ${key}: ${iter(val, depth + 1)}`;
+      }
+
+      if (arr.length === 1) {
+        return `{\n${nextLine}\n${offsetLast}}`;
+      }
+
+      if (idx === 0) { // first line
+        return `{\n${nextLine}`;
+      }
+      if (idx === arr.length - 1) { // last line
+        return `${acc}\n${nextLine}\n${offsetLast}}`;
+      }
+      return `${acc}\n${nextLine}`;
+    }, '');
+  };
+
+  return iter(ast, 1);
 }
 
 function getFormatter(formatterType = 'stylish') {
