@@ -17,7 +17,7 @@ const ORIGINS_MARKS = {
 
 function stylish(ast) {
   const space = ' ';
-  const spacesCount = 4;
+  const spacesCount = 2;
 
   const iter = (nextNode, depth) => {
     // return primitive value if it's exists. Also return array as is.
@@ -30,20 +30,19 @@ function stylish(ast) {
 
     return iterable.reduce((acc, [key, val], idx, arr) => {
       const offset = space.repeat(spacesCount * depth);
-      const offsetLast = space.repeat(spacesCount * depth - (spacesCount / 2));
+      const offsetLast = space.repeat(spacesCount * depth - (spacesCount));
       let nextLine;
 
       if (val.origin === ORIGINS.bothdiff) {
         nextLine = val.values.map((raw, id, arrVals) => {
           const mark = ORIGINS_MARKS[raw.origin];
           const nl = id > 0 && id === arrVals.length - 1 ? '\n' : '';
-          console.log('raw.value', raw.value);
           const childrs = typeof raw.value === 'object' && raw.value !== null && raw.value.children ? raw.value.children : null;
-          return `${nl}${offset}${mark} ${raw.key}: ${childrs ? iter(childrs, depth + 1) : raw.value}`;
-        }).join(' ');
+          return `${nl}${offset}${mark} ${raw.key}: ${childrs ? iter(childrs, depth + 2) : raw.value}`;
+        }).join('');
       } else {
         const mark = val.origin === ORIGINS.bothdiff ? ORIGINS_MARKS[key] : ORIGINS_MARKS[val.origin];
-        nextLine = `${offset}${mark} ${key}: ${iter(val, depth + 1)}`;
+        nextLine = `${offset}${mark} ${key}: ${iter(val, depth + 2)}`;
       }
 
       if (arr.length === 1) {
