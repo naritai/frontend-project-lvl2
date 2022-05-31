@@ -14,3 +14,5 @@ program
   .action(genDiff);
 
 program.parse();
+
+export default genDiff;
