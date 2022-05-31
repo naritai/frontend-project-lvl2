@@ -31,7 +31,7 @@ test('Compare JSON files. Result in plain format', () => {
   const file1 = getFixturePath('file1.json');
   const file2 = getFixturePath('file2.json');
   const expected = readFile('resultPlainFormat.txt');
-  const actual = genDiff(file1, file2, 'plain');
+  const actual = genDiff(file1, file2, { format: 'plain' });
 
   expect(actual).toEqual(expected);
 });
