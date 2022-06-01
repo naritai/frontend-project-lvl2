@@ -35,3 +35,11 @@ test('Compare JSON files. Result in plain format', () => {
 
   expect(actual).toEqual(expected);
 });
+
+test('Compare JSON files. Result in JSON format', () => {
+  const file1 = getFixturePath('file1.json');
+  const file2 = getFixturePath('file2.json');
+  const actual = genDiff(file1, file2, 'json');
+
+  expect(() => JSON.parse(actual)).not.toThrow();
+});
