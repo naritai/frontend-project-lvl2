@@ -11,7 +11,11 @@ program
   .option('-f, --format <type>', 'output format', 'stylish')
   .argument('<filepath1>')
   .argument('<filepath2>')
-  .action(genDiff);
+  .action((file1, file2, options) => {
+    const { format } = options;
+    const diff = genDiff(file1, file2, format);
+    console.log(diff);
+  });
 
 program.parse();
 
