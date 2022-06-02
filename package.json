@@ -2,8 +2,11 @@
   "name": "@hexlet/code",
   "version": "1.0.0",
   "description": "[![Actions Status](https://github.com/naritai/frontend-project-lvl2/workflows/hexlet-check/badge.svg)](https://github.com/naritai/frontend-project-lvl2/actions)",
-  "main": "src/gendiffFunction.js",
+  "main": "index.js",
   "type": "module",
+  "bin": {
+    "gendiff": "bin/gendiff.mjs"
+  },
   "scripts": {
     "test": "jest"
   },
