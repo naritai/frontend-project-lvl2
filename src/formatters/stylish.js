@@ -14,35 +14,28 @@ function stylish(ast) {
     const children = nextNode.children ? nextNode.children : nextNode;
     const iterable = Object.entries(children);
 
-    return iterable.reduce((acc, [key, val], idx, arr) => {
-      const offset = space.repeat(spacesCount * depth);
-      const offsetLast = space.repeat(spacesCount * depth - (spacesCount));
-      let nextLine;
+    const offset = space.repeat(spacesCount * depth);
+    const offsetLast = space.repeat(spacesCount * depth - (spacesCount));
 
+    const lines = iterable.map(([key, val]) => {
       if (val.origin === ORIGINS.bothdiff) {
-        nextLine = val.values.map((raw, id, arrVals) => {
+        const line = val.values.map((raw) => {
           const mark = ORIGINS_STYLISH_MARKS[raw.origin];
-          const nl = id > 0 && id === arrVals.length - 1 ? '\n' : '';
           const childrs = typeof raw.value === 'object' && raw.value !== null && raw.value.children ? raw.value.children : null;
-          return `${nl}${offset}${mark} ${raw.key}: ${childrs ? iter(childrs, depth + 2) : raw.value}`;
-        }).join('');
-      } else {
-        const mark = ORIGINS_STYLISH_MARKS[val.origin];
-        nextLine = `${offset}${mark} ${key}: ${iter(val, depth + 2)}`;
+          return `${offset}${mark} ${raw.key}: ${childrs ? iter(childrs, depth + 2) : raw.value}`;
+        }).join('\n');
+        return line;
       }
 
-      if (arr.length === 1) {
-        return `{\n${nextLine}\n${offsetLast}}`;
-      }
+      const mark = ORIGINS_STYLISH_MARKS[val.origin];
+      return `${offset}${mark} ${key}: ${iter(val, depth + 2)}`;
+    });
 
-      if (idx === 0) { // first line
-        return `{\n${nextLine}`;
-      }
-      if (idx === arr.length - 1) { // last line
-        return `${acc}\n${nextLine}\n${offsetLast}}`;
-      }
-      return `${acc}\n${nextLine}`;
-    }, '');
+    return [
+      '{',
+      ...lines,
+      `${offsetLast}}`,
+    ].join('\n');
   };
 
   return iter(ast, 1);

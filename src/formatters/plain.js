@@ -24,20 +24,17 @@ function plain(ast) {
       const prefix = prevKeys ? `${prevKeys}.` : '';
       if (val.origin === ORIGINS.second) {
         const descr = getValueDescription(val.children ? val.children : val.value);
-        acc.push(`Property '${prefix}${key}' was added with value: ${descr}`);
-        return acc;
+        return [...acc, `Property '${prefix}${key}' was added with value: ${descr}`];
       }
       if (val.origin === ORIGINS.first) {
-        acc.push(`Property '${prefix}${key}' was removed`);
-        return acc;
+        return [...acc, `Property '${prefix}${key}' was removed`];
       }
 
       if (val.origin === ORIGINS.bothdiff) {
         const { values } = val;
         const descr1 = getValueDescription(values[0].value);
         const descr2 = getValueDescription(values[1].value);
-        acc.push(`Property '${prefix}${key}' was updated. From ${descr1} to ${descr2}`);
-        return acc;
+        return [...acc, `Property '${prefix}${key}' was updated. From ${descr1} to ${descr2}`];
       }
 
       if (val.origin === ORIGINS.bothsame && val.value) {

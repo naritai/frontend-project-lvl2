@@ -30,6 +30,8 @@ function buildDiffAST(obj1, obj2) {
     const allUniqKeys = uniq([...Object.keys(deepObj1), ...Object.keys(deepObj2)]);
     const allSortedKeys = sortBy(allUniqKeys);
 
+    const subTree = {};
+
     allSortedKeys.forEach((key) => {
       const obj1Value = deepObj1[key];
       const obj2Value = deepObj2[key];
@@ -37,13 +39,13 @@ function buildDiffAST(obj1, obj2) {
       if (bothObjectsHaveProp(key, deepObj1, deepObj2)) {
         if (bothValuesAreObjects(obj1Value, obj2Value)) {
           // RECURSIVE CALL
-          currentAST[key] = createNode(key, 'bothsame', obj1Value, buildDiffAST(obj1Value, obj2Value));
+          subTree[key] = createNode(key, 'bothsame', obj1Value, buildDiffAST(obj1Value, obj2Value));
         } else if (obj1Value === obj2Value) {
           // BOTH VALUES SAME TYPES
-          currentAST[key] = createNode(key, 'bothsame', obj1Value);
+          subTree[key] = createNode(key, 'bothsame', obj1Value);
         } else {
           // BOTH VALUES EXIST, BUT THEY ARE DIFFERENT TYPES
-          currentAST[key] = {
+          subTree[key] = {
             key,
             origin: 'bothdiff',
             values: [
@@ -62,14 +64,14 @@ function buildDiffAST(obj1, obj2) {
         }
       } else if (deepObj1.hasOwnProperty(key)) { // ONLY FIRST OBJECT HAS NODE
         const origin = Object.keys(deepObj2).length ? 'first' : 'none';
-        currentAST[key] = isObject(obj1Value) ? createNode(key, origin, obj1Value, buildDiffAST(obj1Value, {})) : createNode(key, origin, obj1Value);
+        subTree[key] = isObject(obj1Value) ? createNode(key, origin, obj1Value, buildDiffAST(obj1Value, {})) : createNode(key, origin, obj1Value);
       } else if (deepObj2.hasOwnProperty(key)) { // ONLY SECOND OBJECT HAS NODE
         const origin = Object.keys(deepObj1).length ? 'second' : 'none';
-        currentAST[key] = isObject(obj2Value) ? createNode(key, origin, obj2Value, buildDiffAST(obj2Value, {})) : createNode(key, origin, obj2Value);
+        subTree[key] = isObject(obj2Value) ? createNode(key, origin, obj2Value, buildDiffAST(obj2Value, {})) : createNode(key, origin, obj2Value);
       }
     });
 
-    return currentAST;
+    return Object.assign(currentAST, subTree);
   };
 
   return iter({}, obj1, obj2);
