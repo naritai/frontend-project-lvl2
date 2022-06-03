@@ -30,22 +30,23 @@ function buildDiffAST(obj1, obj2) {
     const allUniqKeys = uniq([...Object.keys(deepObj1), ...Object.keys(deepObj2)]);
     const allSortedKeys = sortBy(allUniqKeys);
 
-    const subTree = {};
-
-    allSortedKeys.forEach((key) => {
+    const subTree = allSortedKeys.reduce((acc, key) => {
       const obj1Value = deepObj1[key];
       const obj2Value = deepObj2[key];
 
       if (bothObjectsHaveProp(key, deepObj1, deepObj2)) {
         if (bothValuesAreObjects(obj1Value, obj2Value)) {
           // RECURSIVE CALL
-          subTree[key] = createNode(key, 'bothsame', obj1Value, buildDiffAST(obj1Value, obj2Value));
-        } else if (obj1Value === obj2Value) {
+          return { ...acc, [key]: createNode(key, 'bothsame', obj1Value, buildDiffAST(obj1Value, obj2Value)) };
+        }
+        if (obj1Value === obj2Value) {
           // BOTH VALUES SAME TYPES
-          subTree[key] = createNode(key, 'bothsame', obj1Value);
-        } else {
-          // BOTH VALUES EXIST, BUT THEY ARE DIFFERENT TYPES
-          subTree[key] = {
+          return { ...acc, [key]: createNode(key, 'bothsame', obj1Value) };
+        }
+        // BOTH VALUES EXIST, BUT THEY ARE DIFFERENT TYPES
+        return {
+          ...acc,
+          [key]: {
             key,
             origin: 'bothdiff',
             values: [
@@ -60,18 +61,23 @@ function buildDiffAST(obj1, obj2) {
                 value: isObject(obj2Value) ? createNode(key, 'second', obj2Value, buildDiffAST(obj2Value, {})) : obj2Value,
               },
             ],
-          };
-        }
-      } else if (deepObj1.hasOwnProperty(key)) { // ONLY FIRST OBJECT HAS NODE
-        const origin = Object.keys(deepObj2).length ? 'first' : 'none';
-        subTree[key] = isObject(obj1Value) ? createNode(key, origin, obj1Value, buildDiffAST(obj1Value, {})) : createNode(key, origin, obj1Value);
-      } else if (deepObj2.hasOwnProperty(key)) { // ONLY SECOND OBJECT HAS NODE
-        const origin = Object.keys(deepObj1).length ? 'second' : 'none';
-        subTree[key] = isObject(obj2Value) ? createNode(key, origin, obj2Value, buildDiffAST(obj2Value, {})) : createNode(key, origin, obj2Value);
+          },
+        };
       }
-    });
+      if (deepObj1.hasOwnProperty(key)) { // ONLY FIRST OBJECT HAS NODE
+        const origin = Object.keys(deepObj2).length ? 'first' : 'none';
+        return { ...acc, [key]: isObject(obj1Value) ? createNode(key, origin, obj1Value, buildDiffAST(obj1Value, {})) : createNode(key, origin, obj1Value) };
+      }
 
-    return Object.assign(currentAST, subTree);
+      if (deepObj2.hasOwnProperty(key)) { // ONLY SECOND OBJECT HAS NODE
+        const origin = Object.keys(deepObj1).length ? 'second' : 'none';
+        return { ...acc, [key]: isObject(obj2Value) ? createNode(key, origin, obj2Value, buildDiffAST(obj2Value, {})) : createNode(key, origin, obj2Value) };
+      }
+
+      return acc;
+    }, currentAST);
+
+    return subTree;
   };
 
   return iter({}, obj1, obj2);
