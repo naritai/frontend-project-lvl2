@@ -4,35 +4,30 @@ import process from 'process';
 import yaml from 'js-yaml';
 
 function readFile(filePath) {
-  return fs.readFileSync(filePath, { encoding: 'utf-8' });
+  const fullPath = path.resolve(process.cwd(), filePath);
+  const data = fs.readFileSync(fullPath, { encoding: 'utf-8' }).toString();
+  return data;
 }
 
-function parseJSON(filePath) {
-  return JSON.parse(readFile(filePath));
+function parseJSON(data) {
+  return JSON.parse(data);
 }
 
-function parseYAML(filePath) {
-  return yaml.load(readFile(filePath));
+function parseYAML(data) {
+  return yaml.load(data);
 }
 
-function parseFiles(path1, path2) {
-  const resolvedPath1 = path.resolve(process.cwd(), path1);
-  const resolvedPath2 = path.resolve(process.cwd(), path2);
-  const paths = [resolvedPath1, resolvedPath2];
+function parseFile(filePath) {
+  const data = readFile(filePath);
+  const ext = path.extname(filePath);
 
-  const parsedData = paths.map((filePath) => {
-    const ext = path.extname(filePath);
-
-    if (ext === '.json') {
-      return parseJSON(filePath);
-    }
-    if (ext === '.yml' || ext === '.yaml') {
-      return parseYAML(filePath);
-    }
-    return path;
-  });
-
-  return parsedData;
+  if (ext === '.json') {
+    return parseJSON(data);
+  }
+  if (ext === '.yml' || ext === '.yaml') {
+    return parseYAML(data);
+  }
+  return path;
 }
 
-export default parseFiles;
+export default parseFile;
